@@ -58,10 +58,8 @@ def create_superdark(crj_filename, basedark):
 
         crj_hdu[('sci', 1)].data = only_dark + only_hotpix
 
-        #- update DQ extension
-        crj_hdu[('dq', 1)].data = np.where(only_hotpix >= p_five_sigma,
-                                           16,
-                                           crj_hdu[('dq', 1)].data)
+        #- update DQ extension (EDITED) here I only want to see what dq=16 flags are incorperated from the input crj file (calibrated with the input bias file)
+        crj_hdu[('dq', 1)].data = np.where(only_hotpix >= p_five_sigma, 0, crj_hdu[('dq', 1)].data)
 
         #- Update Error
         crj_hdu[('err', 1)].data = np.where(only_hotpix == 0,
