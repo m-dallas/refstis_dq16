@@ -59,16 +59,14 @@ def create_superdark(crj_filename, basedark):
         crj_hdu[('sci', 1)].data = only_dark + only_hotpix
 
         #- update DQ extension EDITED to redefine a threshold using new sigma clip parameters -> changed here to the definition in basedark
-        im_mean, im_median, im_std = sigma_clipped_stats(crj_hdu[('sci', 1)].data,
+        new_data_mean, new_data_median, new_data_std = sigma_clipped_stats(crj_hdu[('sci', 1)].data,
                                                          sigma=3,
                                                          maxiters=40)
-
-        five_sigma = im_median + 5 * im_std
-        index = np.where((crj_hdu[('sci', 1)].data > five_sigma) &
-                         (crj_hdu[('sci', 1)].data > im_mean + 0.1))
-
-        print(f'dq 16s defined now as above {five_sigma} and {im_mean}+0.1')
-        crj_hdu[('dq', 1)].data[index] = 16
+        new_fivesig = new_data_median + 5.0 * base_std # should base_std be updated to 'new_base_std'?
+        
+        crj_hdu[('dq', 1)].data = np.where(only_hotpix >= new_fivesig,
+                                           16,
+                                           crj_hdu[('dq', 1)].data)
 
         #- Update Error
         crj_hdu[('err', 1)].data = np.where(only_hotpix == 0,
