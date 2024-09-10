@@ -68,6 +68,8 @@ def create_superdark(crj_filename, basedark):
                                            16,
                                            crj_hdu[('dq', 1)].data)
 
+        print(f'hotpix now defined as above {new_fivesig} and adopted from original crj')
+
         #- Update Error
         crj_hdu[('err', 1)].data = np.where(only_hotpix == 0,
                                             basedark_hdu[('err', 1)].data,
