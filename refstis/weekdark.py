@@ -67,6 +67,7 @@ def create_superdark(crj_filename, basedark):
         index = np.where((crj_hdu[('sci', 1)].data > five_sigma) &
                          (crj_hdu[('sci', 1)].data > im_mean + 0.1))
 
+        print(f'dq 16s defined now as above {five_sigma} and {im_mean}+0.1')
         crj_hdu[('dq', 1)].data[index] = 16
 
         #- Update Error
