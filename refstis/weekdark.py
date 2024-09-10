@@ -60,6 +60,10 @@ def create_superdark(crj_filename, basedark):
 
         #- update DQ extension EDITED I am copying Ullyses method from https://github.com/spacetelescope/ullyses
         # crj_hdu[('dq', 1)].data = np.where(only_hotpix >= p_five_sigma, 16, crj_hdu[('dq', 1)].data)
+        # Wipe dq 16
+        sci_dq16 = np.where((crj_hdu[('dq', 1)].data&16 == 16))
+        crj_hdu[('dq', 1)].data[sci_dq16] -= 16
+        # Apply new threshold and flag those
         new_threshold = (np.std(crj_hdu[('sci', 1)].data)*5) + np.median(crj_hdu[('sci', 1)].data)
         print(f'pure threshold: {new_threshold}')
         dark_inds = np.where((crj_hdu[('sci', 1)].data > new_threshold) | (crj_hdu[('sci', 1)].data < -new_threshold))
