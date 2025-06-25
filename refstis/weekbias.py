@@ -69,8 +69,9 @@ def make_weekbias(input_list, refbias_name, basebias):
         hdu[('sci', 1)].data = baseline_sci + only_hotcols
 
         #-- update DQ extension
-        # Now flags above the 7-sigma level residual as hot pixels
-        hot_index = np.where(only_hotcols > (resi_mean + 7.0 * resi_std))
+        # Now flags above the 3-sigma level residual as hot pixels- maybe just should be >0 since this means it wasn't smoothed out by the residual.
+        # hot_index = np.where(only_hotcols > (resi_mean + 3.0 * resi_std))
+        hot_index = np.where(only_hotcols > 0)
         hdu[('dq', 1)].data[hot_index] = 16
 
         #- update ERR
