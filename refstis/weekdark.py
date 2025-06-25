@@ -55,11 +55,13 @@ def create_superdark(crj_filename, basedark):
                              basedark_med,
                              basedark_hdu[('sci', 1)].data)
 
-
         crj_hdu[('sci', 1)].data = only_dark + only_hotpix
 
         #- update DQ extension
-        crj_hdu[('dq', 1)].data = np.where(only_hotpix >= p_five_sigma,
+        crj_hdu[('dq', 1)].data &= ~2**4  # Remove any existing hot pixel flag 
+
+        dq_seven_sigma = data_median + (7*data_std)
+        crj_hdu[('dq', 1)].data = np.where(only_hotpix >= dq_seven_sigma,
                                            16,
                                            crj_hdu[('dq', 1)].data)
 

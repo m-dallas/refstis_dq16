@@ -19,47 +19,47 @@ from . import functions
 
 #-------------------------------------------------------------------------------
 
-def flag_hot_pixels(refbias_name):
-    """Flag hotpixels in the DQ array
+# def flag_hot_pixels(refbias_name):
+#     """Flag hotpixels in the DQ array
 
-    Pixels more than (mean + 3*sigma) away from a median smoothed image
-    are flagged as DQ=16 in the DQ array.
+#     Pixels more than (mean + 3*sigma) away from a median smoothed image
+#     are flagged as DQ=16 in the DQ array.
 
-    .. note:: The input file is updated in-place.
+#     .. note:: The input file is updated in-place.
 
-    .. note::
-      The IRAF version of this pipeline specified a 2x15 pixel median filter
-      to calculate the smoothed imaged, but the IRAF task documentation says that
-      even sizes are increased by 1 for the computation.  A 3x5 pixel filter is
-      used directly here.
+#     .. note::
+#       The IRAF version of this pipeline specified a 2x15 pixel median filter
+#       to calculate the smoothed imaged, but the IRAF task documentation says that
+#       even sizes are increased by 1 for the computation.  A 3x5 pixel filter is
+#       used directly here.
 
-    Parameters
-    ----------
-    refbias_name : str
-        name of the reference file to flag
+#     Parameters
+#     ----------
+#     refbias_name : str
+#         name of the reference file to flag
 
-    """
+#     """
 
-    with fits.open(refbias_name, mode='update') as refbias_hdu:
-        smooth_bias = medfilt(np.array(refbias_hdu[('sci', 1)].data, dtype=np.float32), (3, 15))
+#     with fits.open(refbias_name, mode='update') as refbias_hdu:
+#         smooth_bias = medfilt(np.array(refbias_hdu[('sci', 1)].data, dtype=np.float32), (3, 15))
 
-        smooth_bias_mean, smooth_bias_med, smooth_bias_std = sigma_clipped_stats(smooth_bias, sigma=3, maxiters=30)
-        bias_mean, bias_median, bias_std = sigma_clipped_stats(refbias_hdu[('sci', 1)].data, sigma=3, maxiters=30)
+#         smooth_bias_mean, smooth_bias_med, smooth_bias_std = sigma_clipped_stats(smooth_bias, sigma=3, maxiters=30)
+#         bias_mean, bias_median, bias_std = sigma_clipped_stats(refbias_hdu[('sci', 1)].data, sigma=3, maxiters=30)
 
 
-        smooth_bias += (bias_mean - smooth_bias_mean)
+#         smooth_bias += (bias_mean - smooth_bias_mean)
 
-        bias_residual = refbias_hdu[('sci', 1)].data - smooth_bias
+#         bias_residual = refbias_hdu[('sci', 1)].data - smooth_bias
 
-        resid_mean, resid_median, resid_std = sigma_clipped_stats(bias_residual,
-                                                               sigma=3,
-                                                               maxiters=30)
-        r_five_sigma = resid_mean + 5.0 * resid_std
+#         resid_mean, resid_median, resid_std = sigma_clipped_stats(bias_residual,
+#                                                                sigma=3,
+#                                                                maxiters=30)
+#         r_five_sigma = resid_mean + 5.0 * resid_std
 
-        print('Updating DQ values of hot pixels above a level of ', r_five_sigma)
-        refbias_hdu[('dq', 1)].data = np.where(bias_residual > r_five_sigma,
-                                               16,
-                                               refbias_hdu[('dq', 1)].data)
+#         print('Updating DQ values of hot pixels above a level of ', r_five_sigma)
+#         refbias_hdu[('dq', 1)].data = np.where(bias_residual > r_five_sigma,
+#                                                16,
+#                                                refbias_hdu[('dq', 1)].data)
 
 #-------------------------------------------------------------------------------
 
@@ -88,7 +88,7 @@ def make_refbias(input_list, refbias_name='refbias.fits'):
     crj_filename = functions.crreject(joined_out)
 
     shutil.copy(crj_filename, refbias_name)
-    flag_hot_pixels(refbias_name)
+    # flag_hot_pixels(refbias_name)
     functions.update_header_from_input(refbias_name, input_list)
     fits.setval(refbias_name, 'TASKNAME', ext=0, value='refbias')
 
